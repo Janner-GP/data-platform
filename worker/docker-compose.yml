@@ -1,16 +1,12 @@
-x-airflow-common:
-  # In order to add custom dependencies or upgrade provider distributions you can use your extended image.
-  # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
-  # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  &airflow-common
+x-airflow-common: &airflow-common
   image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.2.0}
-  # build: .
   env_file:
     - .env
   volumes:
-    - ../airflow/logs:/opt/airflow/logs
-    - ../airflow/config:/opt/airflow/config
-    - ../airflow/plugins:/opt/airflow/plugins
+    - airflow_logs:/opt/airflow/logs
+    - airflow_config:/opt/airflow/config
+    - airflow_plugins:/opt/airflow/plugins
+    - ../pipelines:/opt/pipelines
   user: "${AIRFLOW_UID:-50000}:0"
 
 services:
@@ -18,7 +14,6 @@ services:
     <<: *airflow-common
     command: airflow celery worker --autoscale 4,1 -H ${CELERY_HOSTNAME} -q ${QUEUES}
     healthcheck:
-      # yamllint disable rule:line-length
       test:
         [
           "CMD-SHELL",
@@ -32,10 +27,11 @@ services:
       retries: 5
       start_period: 30s
     mem_limit: 1g
-    env_file:
-      - .env
     environment:
-      # Required to handle warm shutdown of the celery workers properly
-      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
     restart: always
+
+volumes:
+  airflow_logs:
+  airflow_config:
+  airflow_plugins:
