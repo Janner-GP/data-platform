@@ -12,6 +12,8 @@ x-airflow-common: &airflow-common
 services:
 
   airflow-apiserver:
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
     <<: *airflow-common
     command: >
       bash -c "pip install 'apache-airflow-core[gunicorn]' && airflow api-server"
@@ -23,6 +25,8 @@ services:
         condition: service_completed_successfully
 
   airflow-scheduler:
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
     <<: *airflow-common
     command: scheduler
     restart: always
@@ -31,6 +35,8 @@ services:
         condition: service_completed_successfully
 
   airflow-dag-processor:
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
     <<: *airflow-common
     command: dag-processor
     restart: always
@@ -39,6 +45,8 @@ services:
         condition: service_completed_successfully
 
   airflow-triggerer:
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
     <<: *airflow-common
     command: triggerer
     restart: always
@@ -47,6 +55,8 @@ services:
         condition: service_completed_successfully
 
   airflow-init:
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
     <<: *airflow-common
     entrypoint: /bin/bash
     user: "0:0"
@@ -58,6 +68,8 @@ services:
         /entrypoint airflow db migrate
 
   airflow-cli:
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
     <<: *airflow-common
     profiles:
       - debug
@@ -67,6 +79,8 @@ services:
       - airflow
 
   flower:
+    environment:
+      - PYTHONPATH=${PYTHONPATH}
     <<: *airflow-common
     command: celery flower
     profiles:

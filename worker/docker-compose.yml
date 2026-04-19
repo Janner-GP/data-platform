@@ -29,6 +29,7 @@ services:
     mem_limit: 1g
     environment:
       DUMB_INIT_SETSID: "0"
+      PYTHONPATH: /opt/pipelines
     restart: always
 
 volumes:
